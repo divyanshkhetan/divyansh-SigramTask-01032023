@@ -1,23 +1,51 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import "./App.css";
 
 function App() {
+  const [boxes, setBoxes] = useState(Array(16).fill(false));
+  const [redBoxes, setRedBoxes] = useState([]);
+
+  const handleClick = (index) => {
+    // Check if clicked box is already red
+    if (redBoxes.includes(index)) {
+      // Turn it back to blue
+      setBoxes((prevBoxes) =>
+        prevBoxes.map((box, i) => (i === index ? false : box))
+      );
+      setRedBoxes((prevRedBoxes) =>
+        prevRedBoxes.filter((box) => box !== index)
+      );
+    } else {
+      // Turn it red
+      setBoxes((prevBoxes) =>
+        prevBoxes.map((box, i) => (i === index ? true : box))
+      );
+
+      // If two boxes are already red, turn the first one back to blue
+      if (redBoxes.length >= 2) {
+        const firstRedIndex = redBoxes[0];
+        setBoxes((prevBoxes) =>
+          prevBoxes.map((box, i) => (i === firstRedIndex ? false : box))
+        );
+        setRedBoxes((prevRedBoxes) =>
+          prevRedBoxes.filter((box) => box !== firstRedIndex)
+        );
+      }
+
+      // Add clicked box to the redBoxes array
+      setRedBoxes((prevRedBoxes) => [...prevRedBoxes, index]);
+    }
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className='container'>
+      {boxes.map((box, index) => (
+        <div
+          key={index}
+          className={`box ${box ? "red" : "blue"}`}
+          onClick={() => handleClick(index)}
+        />
+      ))}
     </div>
   );
 }
